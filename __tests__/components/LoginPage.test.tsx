@@ -36,7 +36,7 @@ describe('LoginPage Component', () => {
   it('should display demo credentials info', () => {
     render(<LoginPage />)
     
-    expect(screen.getByText(/Demo Credentials/i)).toBeInTheDocument()
+    expect(screen.getByText(/Demo Login/i)).toBeInTheDocument()
     expect(screen.getByText(/admin@test.com/i)).toBeInTheDocument()
     expect(screen.getByText(/staff@test.com/i)).toBeInTheDocument()
   })

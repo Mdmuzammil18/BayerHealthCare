@@ -41,7 +41,8 @@ describe('Staff API Routes', () => {
 
       ;(prisma.user.findMany as jest.Mock).mockResolvedValue(mockStaff)
 
-      const response = await GET()
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/staff')
+      const response = await GET(request)
       const data = await response.json()
 
       expect(response.status).toBe(200)
@@ -55,7 +56,8 @@ describe('Staff API Routes', () => {
     it('should handle errors gracefully', async () => {
       ;(prisma.user.findMany as jest.Mock).mockRejectedValue(new Error('Database error'))
 
-      const response = await GET()
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/staff')
+      const response = await GET(request)
       const data = await response.json()
 
       expect(response.status).toBe(500)
@@ -68,6 +70,7 @@ describe('Staff API Routes', () => {
       const newStaff = {
         name: 'New Staff',
         email: 'newstaff@example.com',
+        password: 'password123',
         staffRole: 'TECHNICIAN',
         department: 'RADIOLOGY',
         shiftPreference: 'NIGHT',
@@ -77,7 +80,7 @@ describe('Staff API Routes', () => {
       const createdStaff = { id: '3', ...newStaff }
       ;(prisma.user.create as jest.Mock).mockResolvedValue(createdStaff)
 
-      const request = new Request('http://localhost:3000/api/staff', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/staff', {
         method: 'POST',
         body: JSON.stringify(newStaff),
       })
@@ -95,7 +98,7 @@ describe('Staff API Routes', () => {
         // missing required fields
       }
 
-      const request = new Request('http://localhost:3000/api/staff', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/staff', {
         method: 'POST',
         body: JSON.stringify(invalidStaff),
       })

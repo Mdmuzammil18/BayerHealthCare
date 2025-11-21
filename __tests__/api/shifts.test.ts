@@ -32,7 +32,7 @@ describe('Shifts API Routes', () => {
 
       ;(prisma.shift.findMany as jest.Mock).mockResolvedValue(mockShifts)
 
-      const request = new Request('http://localhost:3000/api/shifts?date=2025-11-21')
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/shifts?date=2025-11-21')
       const response = await GET(request)
       const data = await response.json()
 
@@ -61,7 +61,7 @@ describe('Shifts API Routes', () => {
 
       ;(prisma.shift.findMany as jest.Mock).mockResolvedValue(mockShifts)
 
-      const request = new Request('http://localhost:3000/api/shifts')
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/shifts')
       const response = await GET(request)
       const data = await response.json()
 
@@ -83,7 +83,7 @@ describe('Shifts API Routes', () => {
       const createdShift = { id: '1', ...newShift, date: new Date(newShift.date) }
       ;(prisma.shift.create as jest.Mock).mockResolvedValue(createdShift)
 
-      const request = new Request('http://localhost:3000/api/shifts', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/shifts', {
         method: 'POST',
         body: JSON.stringify(newShift),
       })
@@ -104,7 +104,7 @@ describe('Shifts API Routes', () => {
         capacity: -1, // Invalid capacity
       }
 
-      const request = new Request('http://localhost:3000/api/shifts', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/shifts', {
         method: 'POST',
         body: JSON.stringify(invalidShift),
       })

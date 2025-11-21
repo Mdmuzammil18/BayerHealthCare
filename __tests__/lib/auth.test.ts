@@ -1,4 +1,4 @@
-import { hashPassword, comparePasswords } from '@/lib/auth'
+import { hashPassword, verifyPassword } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 
 jest.mock('bcryptjs')
@@ -18,14 +18,14 @@ describe('Auth Utilities', () => {
     })
   })
 
-  describe('comparePasswords', () => {
+  describe('verifyPassword', () => {
     it('should return true for matching passwords', async () => {
       const password = 'testpassword123'
       const hashedPassword = 'hashedpassword'
       
       ;(bcrypt.compare as jest.Mock).mockResolvedValue(true)
 
-      const result = await comparePasswords(password, hashedPassword)
+      const result = await verifyPassword(password, hashedPassword)
 
       expect(bcrypt.compare).toHaveBeenCalledWith(password, hashedPassword)
       expect(result).toBe(true)
@@ -37,7 +37,7 @@ describe('Auth Utilities', () => {
       
       ;(bcrypt.compare as jest.Mock).mockResolvedValue(false)
 
-      const result = await comparePasswords(password, hashedPassword)
+      const result = await verifyPassword(password, hashedPassword)
 
       expect(result).toBe(false)
     })

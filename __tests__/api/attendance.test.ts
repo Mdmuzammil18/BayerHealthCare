@@ -42,7 +42,7 @@ describe('Attendance API Routes', () => {
         status: 'PRESENT',
       })
 
-      const request = new Request('http://localhost:3000/api/attendance/check-in', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/attendance/check-in', {
         method: 'POST',
         body: JSON.stringify({ userId: 'user1', shiftId: 'shift1' }),
       })
@@ -69,7 +69,7 @@ describe('Attendance API Routes', () => {
       ;(prisma.shiftAssignment.findFirst as jest.Mock).mockResolvedValue(mockAssignment)
       ;(prisma.attendance.findFirst as jest.Mock).mockResolvedValue(existingAttendance)
 
-      const request = new Request('http://localhost:3000/api/attendance/check-in', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/attendance/check-in', {
         method: 'POST',
         body: JSON.stringify({ userId: 'user1', shiftId: 'shift1' }),
       })
@@ -96,7 +96,7 @@ describe('Attendance API Routes', () => {
         checkOut: new Date(),
       })
 
-      const request = new Request('http://localhost:3000/api/attendance/check-out', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/attendance/check-out', {
         method: 'POST',
         body: JSON.stringify({ userId: 'user1', shiftId: 'shift1' }),
       })
@@ -111,7 +111,7 @@ describe('Attendance API Routes', () => {
     it('should require check-in before check-out', async () => {
       ;(prisma.attendance.findFirst as jest.Mock).mockResolvedValue(null)
 
-      const request = new Request('http://localhost:3000/api/attendance/check-out', {
+      const request = (global as any).createMockNextRequest('http://localhost:3000/api/attendance/check-out', {
         method: 'POST',
         body: JSON.stringify({ userId: 'user1', shiftId: 'shift1' }),
       })
