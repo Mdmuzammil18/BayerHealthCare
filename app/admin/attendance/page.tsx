@@ -136,24 +136,31 @@ export default function AttendancePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4">
               <Link href="/admin/dashboard">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-purple-50">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Attendance Management</h1>
-                <p className="text-sm text-gray-500">View and manually mark staff attendance</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Attendance Management
+                  </h1>
+                  <p className="text-sm text-gray-500">View and manually mark staff attendance</p>
+                </div>
               </div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
-              <p className="text-xs text-blue-800 font-medium">💡 Tip: Click Edit to mark attendance manually</p>
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg px-4 py-2 shadow-sm">
+              <p className="text-xs text-purple-800 font-medium">💡 Tip: Click Edit to mark attendance manually</p>
             </div>
           </div>
         </div>
@@ -161,8 +168,14 @@ export default function AttendancePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
+        <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-purple-600" />
+              <CardTitle className="text-lg">Filter Attendance</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="filterDate">Filter by Date</Label>
@@ -205,12 +218,17 @@ export default function AttendancePage() {
         </Card>
 
         {/* Attendance Table */}
-        <Card>
+        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              Attendance Records ({filteredAttendance.length})
-            </CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Attendance Records</CardTitle>
+                <p className="text-sm text-gray-500">{filteredAttendance.length} records found</p>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {loading ? (

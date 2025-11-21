@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { Users, Plus, Edit, Trash2, Search, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Users, Filter, Heart, UserPlus, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function StaffManagementPage() {
@@ -146,25 +146,35 @@ export default function StaffManagementPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50 to-cyan-50">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/admin/dashboard">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-teal-50">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Staff Management</h1>
-                <p className="text-sm text-gray-500">Manage healthcare staff members</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                    Staff Management
+                  </h1>
+                  <p className="text-sm text-gray-500">Manage healthcare staff members</p>
+                </div>
               </div>
             </div>
-            <Button onClick={() => setShowAddForm(!showAddForm)}>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button 
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
               Add Staff
             </Button>
           </div>
@@ -288,11 +298,17 @@ export default function StaffManagementPage() {
         )}
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
+        <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-teal-600" />
+              <CardTitle className="text-lg">Filter Staff</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="search">Search</Label>
+                <Label htmlFor="search" className="text-sm font-medium">Search</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
@@ -300,7 +316,7 @@ export default function StaffManagementPage() {
                     placeholder="Search by name or email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
                   />
                 </div>
               </div>
