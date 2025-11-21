@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum StaffRole {
+  NURSE
+  DOCTOR
+  TECHNICIAN
+}
+
+enum Department {
+  EMERGENCY
+  ICU
+  GENERAL_WARD
+  SURGERY
+  PEDIATRICS
+  CARDIOLOGY
+  RADIOLOGY
+  LABORATORY
+}
+
+enum ShiftType {
+  MORNING
+  AFTERNOON
+  NIGHT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  EARLY_EXIT
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  role             Role              @default(STAFF)
+  staffRole        StaffRole?
+  department       Department?
+  shiftPreference  ShiftType?
+  passwordHash     String
+  contactNumber    String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  shiftAssignments ShiftAssignment[]
+  attendances      Attendance[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Shift {
+  id          String            @id @default(cuid())
+  date        DateTime
+  type        ShiftType
+  startTime   String            // Format: "HH:mm"
+  endTime     String            // Format: "HH:mm"
+  capacity    Int               @default(5)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  assignments ShiftAssignment[]
+  attendances Attendance[]
+
+  @@index([date])
+  @@index([type])
+}
+
+model ShiftAssignment {
+  id        String   @id @default(cuid())
+  shiftId   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  shift     Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([shiftId, userId])
+  @@index([shiftId])
+  @@index([userId])
+}
+
+model Attendance {
+  id        String            @id @default(cuid())
+  userId    String
+  shiftId   String
+  checkIn   DateTime?
+  checkOut  DateTime?
+  status    AttendanceStatus  @default(ABSENT)
+  remarks   String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shift     Shift             @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, shiftId])
+  @@index([userId])
+  @@index([shiftId])
+  @@index([status])
+}
