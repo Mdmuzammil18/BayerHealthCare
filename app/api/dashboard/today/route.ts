@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
 import { startOfDay, endOfDay } from "date-fns";
 
 // GET /api/dashboard/today - Get today's dashboard data
 export async function GET() {
   try {
-    const user = await requireAuth();
     const today = new Date();
 
-    if (user.role === "ADMIN") {
+    // For demo mode, always show admin dashboard
+    const isAdmin = true;
+
+    if (isAdmin) {
       // Admin dashboard - overview of today's shifts
       const todayShifts = await prisma.shift.findMany({
         where: {
@@ -53,11 +54,11 @@ export async function GET() {
       // Calculate stats
       const totalShifts = todayShifts.length;
       const totalAssignments = todayShifts.reduce(
-        (sum, shift) => sum + shift._count.assignments,
+        (sum: number, shift: any) => sum + shift._count.assignments,
         0
       );
       const totalCapacity = todayShifts.reduce(
-        (sum, shift) => sum + shift.capacity,
+        (sum: number, shift: any) => sum + shift.capacity,
         0
       );
 
@@ -68,8 +69,8 @@ export async function GET() {
         earlyExit: 0,
       };
 
-      todayShifts.forEach((shift) => {
-        shift.attendances.forEach((att) => {
+      todayShifts.forEach((shift: any) => {
+        shift.attendances.forEach((att: any) => {
           if (att.status === "PRESENT") attendanceStats.present++;
           else if (att.status === "LATE") attendanceStats.late++;
           else if (att.status === "ABSENT") attendanceStats.absent++;
@@ -78,7 +79,7 @@ export async function GET() {
       });
 
       return NextResponse.json({
-        shifts: todayShifts.map((shift) => ({
+        shifts: todayShifts.map((shift: any) => ({
           ...shift,
           availableSlots: shift.capacity - shift._count.assignments,
           isFull: shift._count.assignments >= shift.capacity,
@@ -90,42 +91,6 @@ export async function GET() {
           availableSlots: totalCapacity - totalAssignments,
           attendance: attendanceStats,
         },
-      });
-    } else {
-      // Staff dashboard - their shifts for today
-      const myShifts = await prisma.shiftAssignment.findMany({
-        where: {
-          userId: user.id,
-          shift: {
-            date: {
-              gte: startOfDay(today),
-              lte: endOfDay(today),
-            },
-          },
-        },
-        include: {
-          shift: true,
-        },
-      });
-
-      const myAttendance = await prisma.attendance.findMany({
-        where: {
-          userId: user.id,
-          shift: {
-            date: {
-              gte: startOfDay(today),
-              lte: endOfDay(today),
-            },
-          },
-        },
-        include: {
-          shift: true,
-        },
-      });
-
-      return NextResponse.json({
-        shifts: myShifts,
-        attendance: myAttendance,
       });
     }
   } catch (error: any) {

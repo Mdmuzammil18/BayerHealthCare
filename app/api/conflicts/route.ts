@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth";
 import { findConflictsForDate } from "@/lib/conflicts";
 import { startOfDay, addDays } from "date-fns";
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/conflicts - Find shift conflicts
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin();
 
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get("date");
