@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowLeft, Plus, Trash2, Users, Filter, Heart, UserPlus, Search } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Users, Filter, Heart, UserPlus, Search, Edit } from "lucide-react";
 import Link from "next/link";
 
 export default function StaffManagementPage() {
