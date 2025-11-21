@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
 
 // GET /api/attendance/user/[id] - Get attendance history for a user
 export async function GET(
@@ -8,15 +7,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const currentUser = await requireAuth();
-
-    // Staff can only view their own attendance, admins can view anyone's
-    if (currentUser.role !== "ADMIN" && currentUser.id !== params.id) {
-      return NextResponse.json(
-        { error: "Forbidden - You can only view your own attendance" },
-        { status: 403 }
-      );
-    }
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate");

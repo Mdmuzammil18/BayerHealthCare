@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
 import { calculateAttendanceStatus } from "@/lib/attendance";
 
 const updateAttendanceSchema = z.object({
@@ -17,8 +16,6 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
-
     const body = await request.json();
     const data = updateAttendanceSchema.parse(body);
 

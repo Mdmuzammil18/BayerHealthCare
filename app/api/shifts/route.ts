@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
 import { startOfDay, endOfDay } from "date-fns";
 
 const createShiftSchema = z.object({
@@ -15,7 +14,6 @@ const createShiftSchema = z.object({
 // GET /api/shifts - List shifts with optional filters
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin();
 
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get("date");
@@ -96,8 +94,6 @@ export async function GET(request: NextRequest) {
 // POST /api/shifts - Create new shift
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin();
-
     const body = await request.json();
     const data = createShiftSchema.parse(body);
 

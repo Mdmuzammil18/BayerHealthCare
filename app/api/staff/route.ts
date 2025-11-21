@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, hashPassword } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
 
 const createStaffSchema = z.object({
   name: z.string().min(1),
@@ -25,7 +25,6 @@ const createStaffSchema = z.object({
 // GET /api/staff - List all staff (with optional filters)
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin();
 
     const { searchParams } = new URL(request.url);
     const name = searchParams.get("name");
@@ -82,7 +81,6 @@ export async function GET(request: NextRequest) {
 // POST /api/staff - Create new staff member
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin();
 
     const body = await request.json();
     const data = createStaffSchema.parse(body);

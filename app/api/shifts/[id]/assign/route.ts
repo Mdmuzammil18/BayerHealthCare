@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
 import { wouldCreateConflict } from "@/lib/conflicts";
 
 const assignSchema = z.object({
@@ -14,8 +13,6 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
-
     const body = await request.json();
     const { userId } = assignSchema.parse(body);
 
@@ -139,10 +136,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
-
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const body = await request.json();
+    const { userId } = body;
 
     if (!userId) {
       return NextResponse.json(

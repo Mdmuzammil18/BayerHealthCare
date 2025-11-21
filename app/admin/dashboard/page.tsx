@@ -153,7 +153,7 @@ export default function AdminDashboard() {
             <Link href="/admin/shifts">
               <CardHeader>
                 <CardTitle>Shift Management</CardTitle>
-                <CardDescription>Create and manage shifts</CardDescription>
+                <CardDescription>Create shifts and assign staff</CardDescription>
               </CardHeader>
             </Link>
           </Card>

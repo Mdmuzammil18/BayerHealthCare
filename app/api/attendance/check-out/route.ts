@@ -1,26 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAuth } from "@/lib/auth";
 import { calculateAttendanceStatus } from "@/lib/attendance";
 
 const checkOutSchema = z.object({
   shiftId: z.string(),
+  userId: z.string().optional(), // For demo purposes
 });
 
 // POST /api/attendance/check-out - Staff checks out from shift
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAuth();
-
     const body = await request.json();
-    const { shiftId } = checkOutSchema.parse(body);
+    const { shiftId, userId } = checkOutSchema.parse(body);
+    
+    // For demo, use provided userId or a default
+    const actualUserId = userId || "demo-user-id";
 
     // Find attendance record
     const attendance = await prisma.attendance.findUnique({
       where: {
         userId_shiftId: {
-          userId: user.id,
+          userId: actualUserId,
           shiftId,
         },
       },
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     const updated = await prisma.attendance.update({
       where: {
         userId_shiftId: {
-          userId: user.id,
+          userId: actualUserId,
           shiftId,
         },
       },

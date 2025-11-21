@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, hashPassword } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
 
 const updateStaffSchema = z.object({
   name: z.string().min(1).optional(),
@@ -28,8 +28,6 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
-
     const body = await request.json();
     const data = updateStaffSchema.parse(body);
 
@@ -111,8 +109,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
-
     const staff = await prisma.user.findUnique({
       where: { id: params.id },
     });
