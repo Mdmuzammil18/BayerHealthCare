@@ -18,6 +18,7 @@ export default function StaffManagementPage() {
   const [staff, setStaff] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterDepartment, setFilterDepartment] = useState("all");
@@ -61,26 +62,36 @@ export default function StaffManagementPage() {
     }
   };
 
-  const handleAddStaff = async (e: React.FormEvent) => {
+  const handleSubmitStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await fetch("/api/staff", {
-        method: "POST",
+      const isEditing = !!editingStaff;
+      const url = isEditing ? `/api/staff/${editingStaff.id}` : "/api/staff";
+      const method = isEditing ? "PUT" : "POST";
+      
+      // Don't send password if editing and password field is empty
+      const payload: any = { ...formData };
+      if (isEditing && !formData.password) {
+        delete payload.password;
+      }
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to add staff");
+        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'add'} staff`);
       }
 
       toast({
-        title: "Staff Added Successfully",
-        description: `${formData.name} has been added to the system.`,
+        title: isEditing ? "Staff Updated Successfully" : "Staff Added Successfully",
+        description: `${formData.name} has been ${isEditing ? 'updated' : 'added to the system'}.`,
       });
 
       // Reset form
@@ -94,6 +105,7 @@ export default function StaffManagementPage() {
         contactNumber: "",
       });
       setShowAddForm(false);
+      setEditingStaff(null);
 
       // Refresh staff list
       fetchStaff();
@@ -106,6 +118,34 @@ export default function StaffManagementPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditStaff = (staffMember: any) => {
+    setEditingStaff(staffMember);
+    setFormData({
+      name: staffMember.name,
+      email: staffMember.email,
+      password: "", // Don't populate password for security
+      staffRole: staffMember.staffRole,
+      department: staffMember.department,
+      shiftPreference: staffMember.shiftPreference || "MORNING",
+      contactNumber: staffMember.contactNumber || "",
+    });
+    setShowAddForm(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingStaff(null);
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      staffRole: "NURSE",
+      department: "GENERAL_WARD",
+      shiftPreference: "MORNING",
+      contactNumber: "",
+    });
+    setShowAddForm(false);
   };
 
   const handleDeleteStaff = async (id: string, name: string) => {
@@ -171,11 +211,17 @@ export default function StaffManagementPage() {
               </div>
             </div>
             <Button 
-              onClick={() => setShowAddForm(!showAddForm)}
+              onClick={() => {
+                if (showAddForm && editingStaff) {
+                  handleCancelEdit();
+                } else {
+                  setShowAddForm(!showAddForm);
+                }
+              }}
               className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700"
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              Add Staff
+              {showAddForm && editingStaff ? 'Cancel Edit' : 'Add Staff'}
             </Button>
           </div>
         </div>
@@ -186,11 +232,13 @@ export default function StaffManagementPage() {
         {showAddForm && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Add New Staff Member</CardTitle>
-              <CardDescription>Enter staff details to create a new account</CardDescription>
+              <CardTitle>{editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}</CardTitle>
+              <CardDescription>
+                {editingStaff ? 'Update staff member details' : 'Enter staff details to create a new account'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleAddStaff} className="space-y-4">
+              <form onSubmit={handleSubmitStaff} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
@@ -212,13 +260,14 @@ export default function StaffManagementPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password *</Label>
+                    <Label htmlFor="password">Password {editingStaff ? '(leave blank to keep current)' : '*'}</Label>
                     <Input
                       id="password"
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      required
+                      required={!editingStaff}
+                      placeholder={editingStaff ? 'Leave blank to keep current password' : ''}
                     />
                   </div>
                   <div className="space-y-2">
@@ -285,11 +334,11 @@ export default function StaffManagementPage() {
                   </div>
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
+                  <Button type="button" variant="outline" onClick={handleCancelEdit}>
                     Cancel
                   </Button>
                   <Button type="submit" disabled={loading}>
-                    {loading ? "Adding..." : "Add Staff"}
+                    {loading ? (editingStaff ? "Updating..." : "Adding...") : (editingStaff ? "Update Staff" : "Add Staff")}
                   </Button>
                 </div>
               </form>
@@ -397,9 +446,10 @@ export default function StaffManagementPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => toast({ title: "Edit (Demo)", description: "Edit functionality coming soon!" })}
+                            onClick={() => handleEditStaff(member)}
+                            className="hover:bg-blue-50"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-4 h-4 text-blue-600" />
                           </Button>
                           <Button
                             variant="ghost"
